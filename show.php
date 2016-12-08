@@ -9,10 +9,15 @@
 
 // areasテーブル
 // ②SQL作成
+    $friends = array();
+    $male=0;
+    $female=0;
+
   if (!empty($_GET['area_id'])){
     // !empty($_GET['action'])を最初に判定するので
     // 入れないとactionにvalueが入っていないときにエラーになる
     $sql = 'SELECT * FROM `areas` WHERE `area_id` = ?';
+
     // $sql='SELECT * FROM `posts` WHERE `delete_frag` = 0 ORDER BY `created` DESC';
     $data[] = $_GET['area_id'];
 
@@ -24,32 +29,49 @@
     $area_id=$rec['area_id'];
     $area_name = $rec['area_name'];
 
+        // 他の書き方
+        // $area_id=$_GET['area_id'];
+        // $sql = 'SELECT * FROM `areas` WHERE `area_id` = '.$area_id;
 
-// // friendsテーブル
-  // $friends = array();
-  
-
-  //   $sql = 'SELECT * FROM `friends` WHERE `area_id` = ? ';
-
-  //   $stmt = $dbh->prepare($sql);
-  //   $stmt->execute();
-
-  //   $rec = $stmt -> fetch(PDO::FETCH_ASSOC);
-
-  //   if ($rec==false) {
-  //     break;
-  //   }
-  //   $friends[]=$rec;
+    // // friendsテーブル
+    $sql = 'SELECT * FROM `friends` WHERE `area_id` = ? ';
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute($data);
 
 
-
+        while(1){
+    $rec = $stmt -> fetch(PDO::FETCH_ASSOC);
     
+    // 取得できるデータがなかったらループ終了
+    if ($rec==false) {
+      break;
+    }
+
+    $friends[]=$rec;
+    $friend_name=$rec['friend_name'];
+    $gender=$rec['gender'];
+
+    echo $friend_name;
+    echo '<br>';
+
+    // 配列だからechoでは取り出せない
+    // echo $friends['friend_name'];
+    // echo '<br>'
+    if ($gender==0) {
+    	$male++;
+    }elseif ($gender==1) {
+    	$female++;
+    }
+
+
+
+    }
+    echo $male;
+    echo '<br>';
+    echo $female;
+
   }
-
-
-
-
-
+    
 // ③DB切断
       $dbh = null;
 
@@ -109,7 +131,7 @@
     <div class="row">
       <div class="col-md-4 content-margin-top">
       <legend><?php echo $area_name; ?>の友達</legend>
-      <div class="well">男性：2名　女性：1名</div>
+      <div class="well">男性：<?php echo $male ?>名　女性：<?php echo $female ?>名</div>
         <table class="table table-striped table-hover table-condensed">
           <thead>
             <tr>
@@ -119,8 +141,9 @@
           </thead>
           <tbody>
             <!-- 友達の名前を表示 -->
+            <?php foreach ($friends as $friend): ?>
             <tr>
-              <td><div class="text-center">山田　太郎</div></td>
+              <td><div class="text-center"><?php echo $friend['friend_name'] ?></div></td>
               <td>
                 <div class="text-center">
                   <a href="edit.php"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -128,7 +151,8 @@
                 </div>
               </td>
             </tr>
-            <tr>
+        <?php endforeach; ?>
+<!--             <tr>
               <td><div class="text-center">小林　花子</div></td>
               <td>
                 <div class="text-center">
@@ -146,10 +170,10 @@
                 </div>
               </td>
             </tr>
-          </tbody>
+ -->          </tbody>
         </table>
 
-        <input type="button" class="btn btn-default" value="新規作成" onClick="location.href='new.php'">
+        <input type="button" class="btn btn-default" value="新規作成" onClick="location.href='new.php?area_id=<?php echo $_GET['area_id'] ?>'">
       </div>
     </div>
   </div>

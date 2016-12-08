@@ -1,3 +1,60 @@
+<?php 
+    // ここにデータベース接続処理
+    // ①DBを接続
+    $dsn='mysql:dbname=myfriends;host=localhost';
+    $user='root';
+    $password = '';
+    $dbh = new PDO($dsn,$user,$password);
+    $dbh -> query('SET NAMES utf8');
+
+    // ②DB処理
+    if (!empty($_GET['area_id'])) {
+    $sqlget = 'SELECT * FROM `areas` WHERE `area_id` = ?';
+    $stmtget = $dbh->prepare($sqlget);
+    $data[]=$_GET['area_id'];
+    $stmtget->execute($data);
+
+    $recget = $stmtget -> fetch(PDO::FETCH_ASSOC);
+    $areasget[]=$recget;
+    $get_area_id=$recget['area_id'];
+    $get_area_name=$recget['area_name'];
+
+    }
+
+    $sql = 'SELECT * FROM `areas`';
+
+    // $sql='SELECT * FROM `posts` WHERE `delete_frag` = 0 ORDER BY `created` DESC';
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+
+    $areas=array();
+
+    while (1) {
+    $rec = $stmt -> fetch(PDO::FETCH_ASSOC);
+    
+    // 取得できるデータがなかったらループ終了
+    if ($rec==false) {
+      break;
+    }
+
+    $areas[]=$rec;
+    $area_id=$rec['area_id'];
+    $area_name=$rec['area_name'];
+
+// テスト用
+    // echo $area_id;
+    // echo '<br>';
+    // echo $area_name;
+    // echo '<br>';
+
+    }
+
+    // ③DB切断
+    $dbh = null;
+
+
+ ?>
+
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -62,11 +119,23 @@
               <div class="col-sm-10">
                 <select class="form-control" name="area_id">
                   <option value="0">出身地を選択</option>
-                  <option value="1">北海道</option>
+
+                  <?php foreach ($areas as $area): ?>
+
+                  <option value=<?php echo $area['area_id'] ?>
+                  <?php if ($area['area_id']==$_GET['area_id']) {
+                    echo 'selected';
+                  } ?>><?php echo $area['area_name']; ?></option>
+
+<!--                   <?php if (!empty($_GET['area_id'])):  ?>
+                  <option selected=<?php echo $_GET['area_id'] ?>><?php echo $get_area_name; ?></option>
+                　<?php endif; ?> -->
+<!--                   <option value="1">北海道</option>
                   <option value="2">青森</option>
                   <option value="3">岩手</option>
                   <option value="4">宮城</option>
-                  <option value="5">秋田</option>
+                  <option value="5">秋田</option> -->
+                <?php endforeach; ?>
                 </select>
               </div>
             </div>
