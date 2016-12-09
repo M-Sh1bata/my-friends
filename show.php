@@ -51,8 +51,8 @@
     $friend_name=$rec['friend_name'];
     $gender=$rec['gender'];
 
-    echo $friend_name;
-    echo '<br>';
+    // echo $friend_name;
+    // echo '<br>';
 
     // 配列だからechoでは取り出せない
     // echo $friends['friend_name'];
@@ -66,9 +66,10 @@
 
 
     }
-    echo $male;
-    echo '<br>';
-    echo $female;
+    // テスト用
+    // echo $male;
+    // echo '<br>';
+    // echo $female;
 
   }
     
@@ -146,8 +147,8 @@
               <td><div class="text-center"><?php echo $friend['friend_name'] ?></div></td>
               <td>
                 <div class="text-center">
-                  <a href="edit.php"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                  <a href="javascript:void(0);" onclick="destroy();"><i class="fa fa-trash"></i></a>
+                  <a href="edit.php?friend_id=<?php echo $friend['friend_id'] ?>"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
+                  <a href="javascript:void(0);" onclick="return confirm('本当に削除してもよろしいですか？');"href="show.php?action=delete&id=<?php echo $areas['area_id']; ?>;"><i class="fa fa-trash"></i></a>
                 </div>
               </td>
             </tr>

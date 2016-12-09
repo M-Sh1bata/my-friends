@@ -1,3 +1,77 @@
+<?php 
+    // ここにデータベース接続処理
+// ①DBを接続
+    $dsn='mysql:dbname=myfriends;host=localhost';
+    $user='root';
+    $password = '';
+    $dbh = new PDO($dsn,$user,$password);
+    $dbh -> query('SET NAMES utf8');
+
+
+// ②SQL作成
+    // friendテーブルから情報を取得
+    $friend_id = $_GET['friend_id'];
+    // // friendsテーブル
+    $sql = 'SELECT * FROM `friends` WHERE `friend_id` ='.$friend_id;
+
+
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+
+    $friends = array();
+    $friends = $stmt -> fetch(PDO::FETCH_ASSOC);
+
+
+    // echo $friend_name;
+    // echo '<br>';
+
+    // areaテーブルからSELECT OPTION用にデータ取得
+    $sql = 'SELECT * FROM `areas`';
+
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+
+    $areas=array();
+
+    while (1) {
+    $rec = $stmt -> fetch(PDO::FETCH_ASSOC);
+    
+    // 取得できるデータがなかったらループ終了
+    if ($rec==false) {
+      break;
+    }
+
+    $areas[]=$rec;
+    $area_id=$rec['area_id'];
+    $area_name=$rec['area_name'];
+
+// テスト用
+    // echo $area_id;
+    // echo '<br>';
+    // echo $area_name;
+    // echo '<br>';
+
+    }
+
+      if (!empty($_POST)) {
+    // 更新用のSQL分を作成
+    $sql_update = 'UPDATE `friends` SET `friend_name` = ?, `area_id` = ?, `gender` = ? , `age` = ? WHERE `friend_id` = '.$_GET['friend_id'];
+    $data_update[] = $_POST['name'];
+    $data_update[] = $_POST['area_id'];
+    $data_update[] = $_POST['gender'];
+    $data_update[] = $_POST['age'];
+
+  $stmt_update = $dbh -> prepare($sql_update);
+  $stmt_update -> execute($data_update);
+
+  header('Location: edit.php?friend_id='.$_GET['friend_id']);
+  }
+
+        // ③DB切断
+    $dbh = null;
+
+ ?>
+
 <!DOCTYPE html>
 <html lang="ja">
   <head>
@@ -53,7 +127,7 @@
             <div class="form-group">
               <label class="col-sm-2 control-label">名前</label>
               <div class="col-sm-10">
-                <input type="text" name="name" class="form-control" placeholder="山田　太郎" value="山田　太郎">
+                <input type="text" name="name" class="form-control" placeholder="山田　太郎" value="<?php echo $friends['friend_name']; ?>">
               </div>
             </div>
             <!-- 出身 -->
@@ -62,11 +136,15 @@
               <div class="col-sm-10">
                 <select class="form-control" name="area_id">
                   <option value="0">出身地を選択</option>
-                  <option value="1" selected>北海道</option>
-                  <option value="2">青森</option>
+                  <?php foreach ($areas as $area): ?> 
+                  <option value="<?php echo $area['area_id'] ?>" <?php if ($area['area_id']==$friends['area_id']) {
+                  echo 'selected';
+                  } ?>><?php echo $area['area_name'] ?></option>
+                <?php endforeach ?>
+<!--                   <option value="2">青森</option>
                   <option value="3">岩手</option>
                   <option value="4">宮城</option>
-                  <option value="5">秋田</option>
+                  <option value="5">秋田</option> -->
                 </select>
               </div>
             </div>
@@ -75,9 +153,13 @@
               <label class="col-sm-2 control-label">性別</label>
               <div class="col-sm-10">
                 <select class="form-control" name="gender">
-                  <option value="0">性別を選択</option>
-                  <option value="1" selected>男性</option>
-                  <option value="2">女性</option>
+                  <option value="10">性別を選択</option>
+                  <option value="0" <?php if ($friends['gender']==0): ?>
+                    <?php echo "selected"; ?>
+                  <?php endif ?>>男性</option>
+                  <option value="1" <?php if ($friends['gender']==1): ?>
+                    <?php echo "selected"; ?>
+                  <?php endif ?>>女性</option>
                 </select>
               </div>
             </div>
@@ -85,7 +167,7 @@
             <div class="form-group">
               <label class="col-sm-2 control-label">年齢</label>
               <div class="col-sm-10">
-                <input type="text" name="age" class="form-control" placeholder="例：27" value="27">
+                <input type="text" name="age" class="form-control" placeholder="例：27" value="<?php echo $friends['age']; ?>">
               </div>
             </div>
 

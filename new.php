@@ -49,6 +49,25 @@
 
     }
 
+    // 情報の更新処理
+    if (isset($_POST) && !empty($_POST)) {
+     // $sql_update =  INSERT INTO `friends` (`freind_id`, `friend_name`, `area_id`, `gender`, `age`, `created`, `modified`) VALUES (NULL, 'test2', '11', '1', '55', NOW(), CURRENT_TIMESTAMP);
+ 
+    $sql_update = 'INSERT INTO `friends` (`friend_name`, `area_id`, `gender`, `age`, `created`, `modified`)
+                             VALUES (?, ?, ?, ?, NOW(), CURRENT_TIMESTAMP)';
+    $data_update[] = $_POST['name'];
+    $data_update[] = $_POST['area_id'];
+    $data_update[] = $_POST['gender'];
+    $data_update[] = $_POST['age'];
+
+
+    $stmt_update = $dbh->prepare($sql_update);
+    $stmt_update->execute($data_update);
+
+        header('Location: index.php');
+
+         }
+
     // ③DB切断
     $dbh = null;
 
@@ -122,11 +141,11 @@
 
                   <?php foreach ($areas as $area): ?>
 
-                  <option value=<?php echo $area['area_id'] ?>
+                  <option value="<?php echo $area['area_id'] ?>"
                   <?php if ($area['area_id']==$_GET['area_id']) {
                     echo 'selected';
                   } ?>><?php echo $area['area_name']; ?></option>
-
+                  <?php endforeach; ?>
 <!--                   <?php if (!empty($_GET['area_id'])):  ?>
                   <option selected=<?php echo $_GET['area_id'] ?>><?php echo $get_area_name; ?></option>
                 　<?php endif; ?> -->
@@ -135,7 +154,7 @@
                   <option value="3">岩手</option>
                   <option value="4">宮城</option>
                   <option value="5">秋田</option> -->
-                <?php endforeach; ?>
+                
                 </select>
               </div>
             </div>
@@ -144,9 +163,9 @@
               <label class="col-sm-2 control-label">性別</label>
               <div class="col-sm-10">
                 <select class="form-control" name="gender">
-                  <option value="0">性別を選択</option>
-                  <option value="1">男性</option>
-                  <option value="2">女性</option>
+                  <option value="10">性別を選択</option>
+                  <option value="0">男性</option>
+                  <option value="1">女性</option>
                 </select>
               </div>
             </div>
