@@ -63,13 +63,13 @@
     }
 
     // 削除処理を実行
-    if (!empty($_GET['action'])&&$_GET['action']==delete) {
+    if (!empty($_GET['action'])&&$_GET['action']=='delete') {
    	$sql_delete = 'UPDATE `friends` SET `delete_frag` = 1 WHERE `friend_id` = '.$_GET['friend_id'];
 
   	$stmt_delete = $dbh -> prepare($sql_delete);
   	$stmt_delete -> execute();
 
-  	// header('Location: show.php?area_id='.$_GET['area_id']);
+  	header('Location: show.php?area_id='.$_GET['area_id']);
 
     }
 
@@ -157,7 +157,7 @@
               <td>
                 <div class="text-center">
                   <a href="edit.php?friend_id=<?php echo $friend['friend_id'] ?>"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                  <a href="javascript:void(0);" onclick="return confirm('本当に削除してもよろしいですか？');"href="show.php?action=delete&friend_id=<?php echo $friend['friend_id']; ?>;"><i class="fa fa-trash"></i></a>
+                  <a onclick="return confirm('本当に削除してもよろしいですか？');"href="show.php?action=delete&friend_id=<?php echo $friend['friend_id']."&area_id=".$area_id; ?>"><i class="fa fa-trash"></i></a>
                 </div>
               </td>
             </tr>
