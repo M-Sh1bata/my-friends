@@ -14,8 +14,6 @@
     $female=0;
 
   if (!empty($_GET['area_id'])){
-    // !empty($_GET['action'])を最初に判定するので
-    // 入れないとactionにvalueが入っていないときにエラーになる
     $sql = 'SELECT * FROM `areas` WHERE `area_id` = ?';
 
     // $sql='SELECT * FROM `posts` WHERE `delete_frag` = 0 ORDER BY `created` DESC';
@@ -34,7 +32,8 @@
         // $sql = 'SELECT * FROM `areas` WHERE `area_id` = '.$area_id;
 
     // // friendsテーブル
-    $sql = 'SELECT * FROM `friends` WHERE `area_id` = ? ';
+    // delete_frag追加
+    $sql = 'SELECT * FROM `friends` WHERE `delete_frag`=0 AND `area_id` = ?';
     $stmt = $dbh->prepare($sql);
     $stmt->execute($data);
 
@@ -63,6 +62,16 @@
     	$female++;
     }
 
+    // 削除処理を実行
+    if (!empty($_GET['action'])&&$_GET['action']==delete) {
+   	$sql_delete = 'UPDATE `friends` SET `delete_frag` = 1 WHERE `friend_id` = '.$_GET['friend_id'];
+
+  	$stmt_delete = $dbh -> prepare($sql_delete);
+  	$stmt_delete -> execute();
+
+  	// header('Location: show.php?area_id='.$_GET['area_id']);
+
+    }
 
 
     }
@@ -148,7 +157,7 @@
               <td>
                 <div class="text-center">
                   <a href="edit.php?friend_id=<?php echo $friend['friend_id'] ?>"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;
-                  <a href="javascript:void(0);" onclick="return confirm('本当に削除してもよろしいですか？');"href="show.php?action=delete&id=<?php echo $areas['area_id']; ?>;"><i class="fa fa-trash"></i></a>
+                  <a href="javascript:void(0);" onclick="return confirm('本当に削除してもよろしいですか？');"href="show.php?action=delete&friend_id=<?php echo $friend['friend_id']; ?>;"><i class="fa fa-trash"></i></a>
                 </div>
               </td>
             </tr>
@@ -182,5 +191,6 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+
   </body>
 </html>
