@@ -66,6 +66,8 @@
     if (!empty($_GET['action'])&&$_GET['action']=='delete') {
    	$sql_delete = 'UPDATE `friends` SET `delete_frag` = 1 WHERE `friend_id` = '.$_GET['friend_id'];
 
+   	// デバック用
+   	// $var_dump($sql_delete);
   	$stmt_delete = $dbh -> prepare($sql_delete);
   	$stmt_delete -> execute();
 
