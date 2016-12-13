@@ -8,7 +8,17 @@
     $dbh -> query('SET NAMES utf8');
 
 // ②SQL作成
-    $sql = 'SELECT * FROM `areas`';
+    // $sql = 'SELECT `areas`.`area_id`, `areas`.`area_name`, COUNT(`friends`.`friend_id`) AS friends_cnt FROM `areas` LEFT JOIN `friends` ON `areas`.`area_id` = `friends`.`area_id`  GROUP BY `areas`.`area_id`, `areas`.`area_name` ORDER BY `areas`.`area_id`';
+
+// LEFT　JOINに副問合せ
+// COUNTの部分が同じなので、この処理をしても意味がないのでは？
+    $sql = 'SELECT `areas`.`area_id`, `areas`.`area_name`, COUNT(`friends`.`friend_id`) AS friends_cnt FROM `areas` LEFT JOIN (SELECT * FROM `friends` WHERE `friends`.`delete_frag`=0) AS friends ON `areas`.`area_id` = `friends`.`area_id`  GROUP BY `areas`.`area_id`, `areas`.`area_name` ORDER BY `areas`.`area_id`';
+
+// // 関数の中にSELECT文
+//     $sql = 'SELECT `areas`.`area_id`, `areas`.`area_name`, COUNT('SELECT `friends`.`friend_id` FROM `friends` WHERE `friends`.`delete_frag`=0') AS friends_cnt FROM `areas` LEFT JOIN `friends` ON `areas`.`area_id` = `friends`.`area_id`  GROUP BY `areas`.`area_id`, `areas`.`area_name` ORDER BY `areas`.`area_id`';
+
+// // 関数の中にSELECT文を入れ、更にその中に副問合せ
+//     $sql = 'SELECT `areas`.`area_id`, `areas`.`area_name`, COUNT('SELECT `friends`.`friend_id` FROM (SELECT * FROM `friends` WHERE `friends`.`delete_frag`=0)') AS friends_cnt FROM `areas` LEFT JOIN `friends` ON `areas`.`area_id` = `friends`.`area_id` GROUP BY `areas`.`area_id`, `areas`.`area_name` ORDER BY `areas`.`area_id`';
 
 // ③SQL実行
     $stmt = $dbh->prepare($sql);
@@ -38,6 +48,38 @@
 
     $areas[]=$rec;
     }
+
+// 友達の数をカウントする
+//     $sql_count='SELECT `areas`.`area_id`, `areas`.`area_name`, COUNT(`friends`.`friend_id`) AS 　friends_cnt FROM `areas` LEFT JOIN `friends` ON `areas`.`area_id` = `friends`.`area_id` GROUP BY `areas`.`area_id`, `areas`.`area_name` ORDER BY `areas`.`area_id`';
+//     $stmt_count = $dbh->prepare($sql_count);
+//     $stmt_count->execute();
+
+//     // 変数に値を格納
+//     $friends_count = array();
+
+//     // $areaId=$rec['area_id'];
+//     // $areaName = $rec['area_name'];
+
+// // ④データ取得
+//     while(1){
+//     $rec_count = $stmt_count -> fetch(PDO::FETCH_ASSOC);
+//     // 変数に値を格納
+//     // $areaId=$rec['area_id'];
+//     // $areaName = $rec['area_name'];
+
+//     //   echo $areaId;
+//     //   echo $areaName;
+//     //   echo '<br>';
+    
+//     // 取得できるデータがなかったらループ終了
+//     if ($rec_count==false) {
+//       break;
+//     }
+
+//     $friends_count[]=$rec_count;
+//     }
+
+
 
 // ③DB切断
       $dbh = null;
@@ -110,7 +152,7 @@
             <tr>
               <td><div class="text-center"><?php echo $area['area_id']; ?></div></td>
               <td><div class="text-center"><a href="show.php?area_id=<?php echo $area['area_id']; ?>"><?php echo $area['area_name'] ?></a></div></td>
-              <td><div class="text-center">3</div></td>
+              <td><div class="text-center"><?php echo $area['friends_cnt']; ?></div></td>
             </tr>
             <?php endforeach; ?>
 
